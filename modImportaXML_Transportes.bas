@@ -55,9 +55,8 @@ End Sub
 
 Public Function ImportaXML_Transportes(LocalXml As String)
 '---------------------------------------------------------------'
-'                Criado por FabioPaes                           '
-'           Em 12/02/2017 para MAXIMOACCESS                     '
-' Em caso de correÁoes reportar a origem para atualizar o codigo'
+'                Criado por Cezar Barreto                       '
+'           Em 12/02/2020 para Overture                         '
 '---------------------------------------------------------------'
 Call ConnectToDataBase
 
@@ -78,7 +77,7 @@ NomeArq = Dir(Diret & "*.XML", vbArchive)
 Set Db = CurrentDb()
 Set doc = New DOMDocument
 
-'Buscar· todos os arquivos com extenÁ„o .xml da pasta selecionada
+'Buscar√° todos os arquivos com exten√ß√£o .xml da pasta selecionada
 Do While NomeArq <> ""
 doc.Load (LocalXml & NomeArq) 'Pega a Pasta e o Nome do primeiro arquivo....
 'Verifica se o Arquivo foi aberto corretamente e se possui chave. Se possuir importa, se nao Pula pra o Proximo!
@@ -106,11 +105,11 @@ Set rsFor = Db.OpenRecordset("tbFornecedor")
 
 
 
-X = Nz(DLookup("IdFor", "tbFornecedor", "Cnpj = '" & xEmit.Item(0).selectSingleNode("CNPJ").Text & "'"), 0)     'X buscar· o fornecedor na tabela "tbFornecedores"
-'x = Nz(DLookup("idCliente", "tbcliente", "Cnpj = '" & doc.childNodes(2).getElementsByTagName("dest")(0) & "'"), 0) 'X buscar· o fornecedor na tabela "tbFornecedores"
+X = Nz(DLookup("IdFor", "tbFornecedor", "Cnpj = '" & xEmit.Item(0).selectSingleNode("CNPJ").Text & "'"), 0)     'X buscar√° o fornecedor na tabela "tbFornecedores"
+'x = Nz(DLookup("idCliente", "tbcliente", "Cnpj = '" & doc.childNodes(2).getElementsByTagName("dest")(0) & "'"), 0) 'X buscar√° o fornecedor na tabela "tbFornecedores"
 
 
-If X <= 0 Then 'Se x for <=0 significa que nao ta cadastrado, entao ir· cadastrar a transportadora
+If X <= 0 Then 'Se x for <=0 significa que nao ta cadastrado, entao ir√° cadastrar a transportadora
     rsFor.AddNew
         
         On Error Resume Next
@@ -140,16 +139,16 @@ If X <= 0 Then 'Se x for <=0 significa que nao ta cadastrado, entao ir· cadastra
     rsFor.Update
     On Error GoTo 0
    
-'Apos cadastrar o fornecedor, x buscara o ID desse fornecedor para ser utilizado na importaÁ„o do xml em questao
+'Apos cadastrar o fornecedor, x buscara o ID desse fornecedor para ser utilizado na importa√ß√£o do xml em questao
 
 'x = Nz(DLookup("idCliente", "tbcliente", "Cnpj = '" & doc.getElementsByTagName("CNPJ_dest")(0).Text & "'"), 0)
 
 
 
-X = Nz(DLookup("idFor", "tbfornecedor", "Cnpj = '" & varCNPJ & "'"), 0)     'X buscar· o fornecedor na tabela "tbFornecedores"
+X = Nz(DLookup("idFor", "tbfornecedor", "Cnpj = '" & varCNPJ & "'"), 0)     'X buscar√° o fornecedor na tabela "tbFornecedores"
 
 Else
-'atualiza dados do fornecedor j· cadastrado
+'atualiza dados do fornecedor j√° cadastrado
 rsFor.Close
 Set rsFor = Db.OpenRecordset("SELECT * FROM tbFornecedor WHERE IdFor = " & X & "")
 rsFor.Edit
@@ -189,9 +188,9 @@ Set rsFor = Nothing
 'Set xDet = doc.getElementsByTagName("det")
 Set rsTransp = Db.OpenRecordset("tbTransportes")
 
-'verifica se o xml j· foi processado antes pra n„o duplicar a linha
+'verifica se o xml j√° foi processado antes pra n√£o duplicar a linha
 x1 = Nz(DLookup("ChaveCTe", "tbTransportes", "ChaveCTe = '" & doc.getElementsByTagName("chCTe")(0).Text & "'"), 0)
-If x1 = doc.getElementsByTagName("chCTe")(0).Text Then 'Se x for <=0 significa que nao ta cadastrado, entao ir· cadastrar o fornecedor
+If x1 = doc.getElementsByTagName("chCTe")(0).Text Then 'Se x for <=0 significa que nao ta cadastrado, entao ir√° cadastrar o fornecedor
 GoTo proximoarquivo
 Else
 End If
@@ -199,7 +198,7 @@ End If
 
 rsTransp.AddNew
     rsTransp!ID_Emit = X
-    'Necessario essa verificaÁ„o pois na versao XML 1.10 era somente Data (dEmi) ja na 3.0 mudou para DataHora (dhEmi)
+    'Necessario essa verifica√ß√£o pois na versao XML 1.10 era somente Data (dEmi) ja na 3.0 mudou para DataHora (dhEmi)
     
     If (doc.getElementsByTagName("dhEmi").length) Then
     rsTransp!DataEmissao = Format(Left(doc.getElementsByTagName("dhEmi")(0).Text, 10), "dd/mm/yyyy")
@@ -219,7 +218,7 @@ rsTransp.AddNew
     
     Select Case doc.getElementsByTagName("CST")(0).Text
     Case Is = "00" 'Tributada integralmente...
-    rsTransp!CST_Desc = "00 - tributaÁ„o normal do ICMS"
+    rsTransp!CST_Desc = "00 - tributa√ß√£o normal do ICMS"
     Case Is = "40" 'Isento
     rsTransp!CST_Desc = "40 - isento de ICMS"
     Case Is = "90" 'outros'
@@ -283,7 +282,7 @@ regAtual = Nz(DLookup("ID", "tbTransportes", "ChaveCTe = '" & doc.getElementsByT
 rsTransp.Close
 Set rsTransp = Nothing
 
- 'LAN«AR NO CONTAS A PAGAR
+ 'LAN√áAR NO CONTAS A PAGAR
  'REMETENTE - PAGADOR
     strSQL = ("INSERT INTO tb_Detalhe_Boletos_Compras ( DtEmissao, ValorOriginal, NumBoleto, Id_Fornecedor, Fornecedor, Chave_Nfe, STATUS ) " & _
                     "SELECT tbTransportes.DataEmissao, tbTransportes.ValorTotalServico, 'LANC AUTOMATICO' AS Num_boleto, tbTransportes.ID_Emit, tbFornecedor.RazaoSocial, tbTransportes.ChaveCTE, 'ABERTO' AS STATUS " & _
@@ -300,9 +299,9 @@ Set rsTransp = Nothing
 '------------------------------------------------------------------------'
 ' Dados dos Produtos - chaves de nfes transportadas
 
-'verifica se o xml j· foi processado antes pra n„o duplicar a linha
+'verifica se o xml j√° foi processado antes pra n√£o duplicar a linha
 X = Nz(DLookup("ID", "tbTransportesDet", "ID = " & regAtual & ""), 0)
-If X = regAtual Then 'Se x for <=0 significa que nao ta cadastrado, entao ir· cadastrar a chave de transportes
+If X = regAtual Then 'Se x for <=0 significa que nao ta cadastrado, entao ir√° cadastrar a chave de transportes
 GoTo proximoarquivo
 Else
 End If
@@ -310,11 +309,11 @@ End If
 
 I = 0
 
-'Aqui È o Loop que percorrer· pela Tag "det" que s„o os produtos..
-'Buscara produto a produto, e o inserir· na nota que esta sendo importada
+'Aqui √© o Loop que percorrer√° pela Tag "det" que s√£o os produtos..
+'Buscara produto a produto, e o inserir√° na nota que esta sendo importada
 For Each CHAVE In xDet
 
-xinfDoc = doc.getElementsByTagName("infNFe")(I).XML ' xProd desmembrar· o xml pegando produto a produto...
+xinfDoc = doc.getElementsByTagName("infNFe")(I).XML ' xProd desmembrar√° o xml pegando produto a produto...
 X = Nz(DLookup("ID", "tbTransportesDet", "ChaveNFe = '" & separaEntreDuasStringsXML(Replace(xinfDoc, "'", ""), "<chave>", "</chave>") & "'"), 0)
 If X <= 0 Then
 'Cadastra o Produto, pois ainda nao foi cadastrado
@@ -342,7 +341,7 @@ End If
 I = I + 1
 Next
 Else
-'Se abrir xml com erro, ser· add no formulario "aguarde" o nome dele
+'Se abrir xml com erro, ser√° add no formulario "aguarde" o nome dele
 Forms!frmaguarde!txt2 = Forms!frmaguarde!txt2 & vbNewLine & NomeArq
 Forms!frmaguarde.Requery
 End If
@@ -356,10 +355,11 @@ strSQL = ("UPDATE tbTransportes SET tbTransportes.CST = Left(tbTransportes.CST_D
 Conn.Execute strSQL
 
 Forms!frmXMLinput.Requery
-MsgBox "Todos os XMLs da pasta selecionada Foram Importados com Sucesso! " & vbNewLine & "Verifique as Notas lanÁadas!!!", vbInformation, "Sucesso!!!"
+MsgBox "Todos os XMLs da pasta selecionada Foram Importados com Sucesso! " & vbNewLine & "Verifique as Notas lan√ßadas!!!", vbInformation, "Sucesso!!!"
 Db.Close
 Set Db = Nothing
 Call DisconnectFromDataBase
 End Function
+
 
 
