@@ -54,9 +54,8 @@ On Error GoTo 0
 End Sub
 Public Function ImportaXML_Compra(LocalXml As String)
 '---------------------------------------------------------------'
-'                Criado por FabioPaes                           '
-'           Em 12/02/2017 para MAXIMOACCESS                     '
-' Em caso de correÁoes reportar a origem para atualizar o codigo'
+'                Criado por Cezar Barreto                       '
+'           Em 12/02/2020 para Overture                         '
 '---------------------------------------------------------------'
 
 Call ConnectToDataBase
@@ -99,7 +98,7 @@ Dim cCustoTotEntrada As Double
 
 Dim cBaseCalcPis As String
 
-'Buscar· todos os arquivos com extenÁ„o .xml da pasta selecionada
+'Buscar√° todos os arquivos com exten√ß√£o .xml da pasta selecionada
 Do While NomeArq <> ""
 doc.Load (LocalXml & NomeArq) 'Pega a Pasta e o Nome do primeiro arquivo....
 'Verifica se o Arquivo foi aberto corretamente e se possui chave. Se possuir importa, se nao Pula pra o Proximo!
@@ -108,16 +107,16 @@ Set xDet = doc.getElementsByTagName("det")
 '------------------------------------------------------------------------'
 'Insere os Dados do Fornecedor, se nao for Cadastrado.
 Set rsFor = Db.OpenRecordset("tbfornecedor")
-X = Nz(DLookup("IdFor", "tbfornecedor", "Cnpj = '" & doc.getElementsByTagName("CNPJ")(0).Text & "'"), 0) 'X buscar· o fornecedor na tabela "tbfornecedor"
+X = Nz(DLookup("IdFor", "tbfornecedor", "Cnpj = '" & doc.getElementsByTagName("CNPJ")(0).Text & "'"), 0) 'X buscar√° o fornecedor na tabela "tbfornecedor"
 
-If doc.getElementsByTagName("CNPJ")(0).Text = Forms!frmXMLinput!txt_CNPJ_Empresa Then 'Se CNPJ for igual ao da empresa, n„o ir· cadastrar como compra.
+If doc.getElementsByTagName("CNPJ")(0).Text = Forms!frmXMLinput!txt_CNPJ_Empresa Then 'Se CNPJ for igual ao da empresa, n√£o ir√° cadastrar como compra.
 GoTo proximoarquivo
 Else
 End If
 
 
 
-If X <= 0 Then 'Se x for <=0 significa que nao ta cadastrado, entao ir· cadastrar o fornecedor
+If X <= 0 Then 'Se x for <=0 significa que nao ta cadastrado, entao ir√° cadastrar o fornecedor
     rsFor.AddNew
 '     On Error Resume Next
         
@@ -155,11 +154,11 @@ If X <= 0 Then 'Se x for <=0 significa que nao ta cadastrado, entao ir· cadastra
         contFor = contFor + 1
         
     rsFor.Update
-'Apos cadastrar o fornecedor, x buscara o ID desse fornecedor para ser utilizado na importaÁ„o do xml em questao
+'Apos cadastrar o fornecedor, x buscara o ID desse fornecedor para ser utilizado na importa√ß√£o do xml em questao
 X = Nz(DLookup("IdFor", "tbfornecedor", "Cnpj = '" & doc.getElementsByTagName("CNPJ")(0).Text & "'"), 0)
 
 Else
-'atualiza dados do fornecedor j· cadastrado
+'atualiza dados do fornecedor j√° cadastrado
 rsFor.Close
 Set rsFor = Db.OpenRecordset("SELECT * FROM tbfornecedor WHERE IdFor = " & X & "")
 rsFor.Edit
@@ -212,9 +211,9 @@ Set rsFor = Nothing
 'Dados Principais da Nota de Compra (tbCompras)
 Set rsCompra = Db.OpenRecordset("tbCompras")
 
-'verifica se o xml j· foi processado antes pra n„o duplicar a linha
+'verifica se o xml j√° foi processado antes pra n√£o duplicar a linha
 x1 = Nz(DLookup("ChaveNF", "tbCompras", "ChaveNF = '" & doc.getElementsByTagName("chNFe")(0).Text & "'"), 0)
-If x1 = doc.getElementsByTagName("chNFe")(0).Text Then 'Se x for <=0 significa que nao ta cadastrado, entao ir· cadastrar o fornecedor
+If x1 = doc.getElementsByTagName("chNFe")(0).Text Then 'Se x for <=0 significa que nao ta cadastrado, entao ir√° cadastrar o fornecedor
 GoTo proximoarquivo
 Else
 End If
@@ -222,7 +221,7 @@ End If
 
 rsCompra.AddNew
     rsCompra!IdFornecedor = X
-    'Necessario essa verificaÁ„o pois na versao XML 1.10 era somente Data (dEmi) ja na 3.0 mudou para DataHora (dhEmi)
+    'Necessario essa verifica√ß√£o pois na versao XML 1.10 era somente Data (dEmi) ja na 3.0 mudou para DataHora (dhEmi)
     If (doc.getElementsByTagName("dhEmi").length) Then
     rsCompra!DataEmissao = Format(Left(doc.getElementsByTagName("dhEmi")(0).Text, 10), "dd/mm/yyyy")
     Else
@@ -293,9 +292,9 @@ Conn.Execute strSQL
 '------------------------------------------------------------------------'
 ' Dados dos Produtos
 
-'verifica se o xml j· foi processado antes pra n„o duplicar a linha
+'verifica se o xml j√° foi processado antes pra n√£o duplicar a linha
 X = Nz(DLookup("IDCompra", "tbComprasDet", "IDCompra = " & regAtual & ""), 0)
-If X = regAtual Then 'Se x for <=0 significa que nao ta cadastrado, entao ir· cadastrar o fornecedor
+If X = regAtual Then 'Se x for <=0 significa que nao ta cadastrado, entao ir√° cadastrar o fornecedor
 GoTo proximoarquivo
 Else
 End If
@@ -303,10 +302,10 @@ End If
 
 I = 0
 xProd = ""
-'Aqui È o Loop que percorrer· pela Tag "det" que s„o os produtos..
-'Buscara produto a produto, e o inserir· na nota que esta sendo importada
+'Aqui √© o Loop que percorrer√° pela Tag "det" que s√£o os produtos..
+'Buscara produto a produto, e o inserir√° na nota que esta sendo importada
 For Each Det In xDet
-xProd = doc.getElementsByTagName("det")(I).XML ' xProd desmembrar· o xml pegando produto a produto...
+xProd = doc.getElementsByTagName("det")(I).XML ' xProd desmembrar√° o xml pegando produto a produto...
 X = Nz(DLookup("IdProd", "tbCadProd", "DescProd = '" & separaEntreDuasStringsXML(Replace(Replace(xProd, "'", ""), Chr(34), ""), "<xProd>", "</xProd>") & "'"), 0)
 If X <= 0 Then
 'Cadastra o Produto, pois ainda nao foi cadastrado
@@ -323,7 +322,7 @@ rsProd.AddNew
     rsProd!Origem = separaEntreDuasStringsXML(xProd, "<orig>", "</orig>")
         
     'rsProd!Estoque = Replace(separaEntreDuasStringsXML(xProd, "<qCom>", "</qCom>"), ".", ",")
-    'estoque ser· tratado na procedure a parte
+    'estoque ser√° tratado na procedure a parte
     'rsProd!CustoMedio = ((Replace(separaEntreDuasStringsXML(xProd, "<vUnCom>", "</vUnCom>"), ".", ",") * Replace(separaEntreDuasStringsXML(xProd, "<qCom>", "</qCom>"), ".", ",")) + Replace(separaEntreDuasStringsXML(xProd, "<vFrete>", "</vFrete>"), ".", ",") + Replace(separaEntreDuasStringsXML(xProd, "<vSeg>", "</vSeg>"), ".", ",") + Replace(separaEntreDuasStringsXML(xProd, "<vDesc>", "</vDesc>"), ".", ",") + Replace(separaEntreDuasStringsXML(xProd, "<vOutro>", "</vOutro>"), ".", ",")) / Replace(separaEntreDuasStringsXML(xProd, "<qCom>", "</qCom>"), ".", ",")
         
     contProd = contProd + 1
@@ -356,7 +355,7 @@ rsCompDet.AddNew
     rsCompDet!Aliq_ICMS = Replace(separaEntreDuasStringsXML(xProd, "<pICMS>", "</pICMS>"), ".", ",")
     rsCompDet!Valor_ICMS = Replace(separaEntreDuasStringsXML(xProd, "<vICMS>", "</vICMS>"), ".", ",")
     
-    'em discuss„o com o STF
+    'em discuss√£o com o STF
     cBaseCalcPis = Replace(separaEntreDuasStringsXML(xProd, "<PISAliq>", "<pPIS>"), ".", ",")
     rsCompDet!BaseCalc_PisCofins = separaEntreDuasStringsXML(cBaseCalcPis, "<vBC>", "</vBC>")
     
@@ -435,7 +434,7 @@ rsCompDet.AddNew
     rsCompDet!Aliq_ICMS = Replace(separaEntreDuasStringsXML(xProd, "<pICMS>", "</pICMS>"), ".", ",")
     rsCompDet!Valor_ICMS = Replace(separaEntreDuasStringsXML(xProd, "<vICMS>", "</vICMS>"), ".", ",")
     
-    'Discuss„o do STF
+    'Discuss√£o do STF
     cBaseCalcPis = Replace(separaEntreDuasStringsXML(xProd, "<PISAliq>", "<pPIS>"), ".", ",")
     rsCompDet!BaseCalc_PisCofins = separaEntreDuasStringsXML(cBaseCalcPis, "<vBC>", "</vBC>")
     
@@ -455,7 +454,7 @@ rsCompDet.AddNew
    
    
 rsCompDet.Update
-'Limpa os dados do recordset e fecha a conex„o
+'Limpa os dados do recordset e fecha a conex√£o
 rsCompDet.Close
 'rsProd.Close
 Set rsCompDet = Nothing
@@ -465,7 +464,7 @@ End If
 I = I + 1
 Next
 Else
-'Se abrir xml com erro, ser· add no formulario "aguarde" o nome dele
+'Se abrir xml com erro, ser√° add no formulario "aguarde" o nome dele
 Forms!frmaguarde!txt2 = Forms!frmaguarde!txt2 & vbNewLine & NomeArq
 Forms!frmaguarde.Requery
 End If
@@ -484,4 +483,5 @@ Set Db = Nothing
 Call DisconnectFromDataBase
 
 End Function
+
 
