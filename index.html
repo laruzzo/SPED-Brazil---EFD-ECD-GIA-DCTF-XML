@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema EFD - Escrituração Fiscal Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="date"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .download-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .download-link:hover {
+            background: #218838;
+        }
+
+        .connection-status {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sistema EFD</h1>
+            <p>Escrituração Fiscal Digital - ICMS/IPI</p>
+        </div>
+        
+        <div class="content">
+            <div id="connectionStatus" class="connection-status">
+                Verificando conexão...
+            </div>
+
+            <form id="efdForm">
+                <div class="form-group">
+                    <label for="dataInicio">Data de Início:</label>
+                    <input type="date" id="dataInicio" name="dataInicio" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dataFim">Data de Fim:</label>
+                    <input type="date" id="dataFim" name="dataFim" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="idInventario">ID do Inventário:</label>
+                    <input type="number" id="idInventario" name="idInventario" value="1" required>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Gerar EFD</button>
+                    <button type="button" class="btn-secondary" onclick="testConnection()">Testar Conexão</button>
+                </div>
+            </form>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Gerando arquivo EFD...</p>
+            </div>
+
+            <div id="status" class="status"></div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar conexão ao carregar a página
+        window.onload = function() {
+            testConnection();
+        };
+
+        // Função para testar conexão
+        function testConnection() {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.textContent = 'Testando conexão...';
+            statusDiv.className = 'connection-status';
+
+            fetch('/api/efd/test-connection')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        statusDiv.textContent = 'Conexão OK - ' + data.message;
+                        statusDiv.className = 'connection-status connected';
+                    } else {
+                        statusDiv.textContent = 'Erro de Conexão - ' + data.message;
+                        statusDiv.className = 'connection-status disconnected';
+                    }
+                })
+                .catch(error => {
+                    statusDiv.textContent = 'Erro de Conexão - ' + error.message;
+                    statusDiv.className = 'connection-status disconnected';
+                });
+        }
+
+        // Função para mostrar status
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            statusDiv.style.display = 'block';
+        }
+
+        // Função para mostrar loading
+        function showLoading(show) {
+            const loadingDiv = document.getElementById('loading');
+            loadingDiv.style.display = show ? 'block' : 'none';
+        }
+
+        // Manipular envio do formulário
+        document.getElementById('efdForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                data_inicio: formData.get('dataInicio'),
+                data_fim: formData.get('dataFim'),
+                id_inventario: parseInt(formData.get('idInventario'))
+            };
+
+            // Validações básicas
+            if (!data.data_inicio || !data.data_fim) {
+                showStatus('Por favor, preencha todas as datas.', 'error');
+                return;
+            }
+
+            if (new Date(data.data_inicio) > new Date(data.data_fim)) {
+                showStatus('A data de início deve ser anterior à data de fim.', 'error');
+                return;
+            }
+
+            // Mostrar loading
+            showLoading(true);
+            document.getElementById('status').style.display = 'none';
+
+            // Enviar requisição
+            fetch('/api/efd/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showLoading(false);
+                
+                if (data.success) {
+                    const message = data.message + '<br><a href="' + data.download_url + '" class="download-link">Baixar Arquivo EFD</a>';
+                    showStatus('', 'success');
+                    document.getElementById('status').innerHTML = message;
+                } else {
+                    showStatus(data.error || 'Erro ao gerar arquivo EFD', 'error');
+                }
+            })
+            .catch(error => {
+                showLoading(false);
+                showStatus('Erro de comunicação: ' + error.message, 'error');
+            });
+        });
+
+        // Definir data padrão (mês atual)
+        const hoje = new Date();
+        const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+
+        document.getElementById('dataInicio').value = primeiroDia.toISOString().split('T')[0];
+        document.getElementById('dataFim').value = ultimoDia.toISOString().split('T')[0];
+    </script>
+</body>
+</html>
