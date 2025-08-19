@@ -1,5 +1,5 @@
-# SPED-Brazil---EFD-ICMS-IPI
-This repository is part of the project SPED Brazil, specifically to generate the files related to EFD ICMS IPI. Code is originally in VBA and databse is MySQL, and I worked to convert it to Python. There is another repository for the SQL data structure
+# SPED-Brazil
+This repository is part of the project SPED Brazil, specifically to generate the files related to EFD ICMS IPI. Code is originally in VBA and databse is MySQL, and I am working to convert it to Python. There is also SQL files for creation of tables for the SQL data structure
 
 This project was totally developed by me, alone and was used in production environment to generate SPED files to my own company, Overture Brewery. So some part of the code are related to brewery operations, but not necessarily is only to be used on brewery. It is aligned to all business.
 
@@ -7,6 +7,15 @@ I am sharing this code as my brewery close the operations and now I would like t
 
 If you find this code usefull, I would be happy to be invited by you to contribute professionally to develop a commercial solution based on this.
 
+
+The project structure is based on the following modules:
+- EFD ICMS IPI
+- EFD Contribuições
+- DCTF
+- GIA, state of Sao Paulo
+- ECD Contabil
+- Read and upload all XML files, SAT, NFe, Transports
+  
 
 VBA Code Analysis - Tax Recording System
 
